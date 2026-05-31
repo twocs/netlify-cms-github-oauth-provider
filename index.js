@@ -3,6 +3,21 @@ const authMiddleWareInit = require('./auth.js')
 const callbackMiddleWareInit = require('./callback')
 const oauthProvider = process.env.OAUTH_PROVIDER || 'github'
 const loginAuthTarget = process.env.AUTH_TARGET || '_self'
+const defaultTokenHosts = {
+  github: 'https://github.com',
+  gitlab: 'https://gitlab.com',
+  bitbucket: 'https://bitbucket.org'
+}
+const defaultAuthorizePaths = {
+  github: '/login/oauth/authorize',
+  gitlab: '/oauth/authorize',
+  bitbucket: '/site/oauth2/authorize'
+}
+const defaultTokenPaths = {
+  github: '/login/oauth/access_token',
+  gitlab: '/oauth/token',
+  bitbucket: '/site/oauth2/access_token'
+}
 
 const config = {
   client: {
@@ -11,9 +26,9 @@ const config = {
   },
   auth: {
     // Supply GIT_HOSTNAME for enterprise github installs.
-    tokenHost: process.env.GIT_HOSTNAME || 'https://github.com',
-    tokenPath: process.env.OAUTH_TOKEN_PATH || '/login/oauth/access_token',
-    authorizePath: process.env.OAUTH_AUTHORIZE_PATH || '/login/oauth/authorize'
+    tokenHost: process.env.GIT_HOSTNAME || defaultTokenHosts[oauthProvider] || defaultTokenHosts.github,
+    tokenPath: process.env.OAUTH_TOKEN_PATH || defaultTokenPaths[oauthProvider] || defaultTokenPaths.github,
+    authorizePath: process.env.OAUTH_AUTHORIZE_PATH || defaultAuthorizePaths[oauthProvider] || defaultAuthorizePaths.github
   }
 }
 
@@ -27,7 +42,7 @@ function indexMiddleWare (req, res) {
 }
 
 module.exports = {
-  auth: authMiddleWareInit(oauth2),
+  auth: authMiddleWareInit(oauth2, oauthProvider),
   callback: callbackMiddleWareInit(oauth2, oauthProvider),
   success: (req, res) => { res.send('') },
   index: indexMiddleWare

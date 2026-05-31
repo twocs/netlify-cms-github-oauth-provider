@@ -4,7 +4,7 @@
 
 [netlify-cms](https://www.netlifycms.org/) has its own github OAuth client. This implementation was created by reverse engineering the results of that client, so it's not necessary to reimplement client part of [netlify-cms](https://www.netlifycms.org/).
 
-Github, Github Enterprise and Gitlab are currently supported, but as this is a general Oauth client, feel free to submit a PR to add other git hosting providers.
+Github, Github Enterprise, Gitlab and Bitbucket are currently supported, but as this is a general Oauth client, feel free to submit a PR to add other git hosting providers.
 
 Other implementations in: [Go lang](https://github.com/igk1972/netlify-cms-oauth-provider-go).
 
@@ -19,7 +19,7 @@ npm install
 ```
 
 **Create Oauth App**
-Information is available on the [Github Developer Documentation](https://developer.github.com/apps/building-integrations/setting-up-and-registering-oauth-apps/registering-oauth-apps/) or [Gitlab Docs](https://docs.gitlab.com/ee/integration/oauth_provider.html). Fill out the fields however you like, except for **authorization callback URL**. This is where Github or Gitlab will send your callback after a user has authenticated, and should be `https://your.server.com/callback` for use with this repo.
+Information is available on the [Github Developer Documentation](https://developer.github.com/apps/building-integrations/setting-up-and-registering-oauth-apps/registering-oauth-apps/), [Gitlab Docs](https://docs.gitlab.com/ee/integration/oauth_provider.html), or [Bitbucket OAuth2 docs](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/). Fill out the fields however you like, except for **authorization callback URL**. This is where Github, Gitlab, or Bitbucket will send your callback after a user has authenticated, and should be `https://your.server.com/callback` for use with this repo.
 
 ## 2) Config
 
@@ -49,6 +49,14 @@ OAUTH_AUTHORIZE_PATH=/oauth/authorize
 OAUTH_TOKEN_PATH=/oauth/token
 ```
 
+For Bitbucket you can either rely on defaults or explicitly set:
+```ini
+OAUTH_PROVIDER=bitbucket
+SCOPES=repository account email
+OAUTH_AUTHORIZE_PATH=/site/oauth2/authorize
+OAUTH_TOKEN_PATH=/site/oauth2/access_token
+```
+
 You can also setup an environment variable to configure "_blank" target when auth window is opened. Default is "_self".
 ```ini
 AUTH_TARGET=_blank
@@ -71,8 +79,8 @@ You also need to add `base_url` to the backend section of your netlify-cms's con
 
 ```yaml
 backend:
-  name: [github | gitlab]
-  repo: user/repo   # Path to your Github/Gitlab repository
+  name: [github | gitlab | bitbucket]
+  repo: user/repo   # Path to your Github/Gitlab/Bitbucket repository
   branch: master    # Branch to update
   base_url: https://your.server.com # Path to ext auth provider
 ```
